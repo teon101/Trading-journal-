@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Trading Journal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Dashboard</h1>
+            <p>Your Trading Performance</p>
+        </header>
+        
+        <nav class="nav-tabs">
+            <a href="/" class="nav-tab">📝 Journal</a>
+            <a href="/dashboard" class="nav-tab active">📊 Dashboard</a>
+        </nav>
+        
+        <!-- Add Sample Data Button (for testing) -->
+        <div style="text-align: center; margin-bottom: 20px;">
+            <button onclick="addSampleData()" class="btn-primary" style="width: auto; padding: 12px 30px;">
+                🎲 Add Sample Data (for testing)
+            </button>
+        </div>
+        
+        <main>
+            <!-- Rest of the dashboard content stays the same -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-value" id="total-pnl">$0.00</div>
+                    <div class="stat-label">Total P/L</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">🎯</div>
+                    <div class="stat-value" id="win-rate">0%</div>
+                    <div class="stat-label">Win Rate</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">📈</div>
+                    <div class="stat-value" id="expectancy">$0.00</div>
+                    <div class="stat-label">Expectancy</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">⚖️</div>
+                    <div class="stat-value" id="profit-factor">0.00</div>
+                    <div class="stat-label">Profit Factor</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">📉</div>
+                    <div class="stat-value" id="max-drawdown">$0.00</div>
+                    <div class="stat-label">Max Drawdown</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">🔢</div>
+                    <div class="stat-value" id="total-trades">0</div>
+                    <div class="stat-label">Total Trades</div>
+                </div>
+            </div>
+            
+            <!-- Charts -->
+            <div class="charts-grid">
+                <div class="card chart-card">
+                    <h3>📈 Equity Curve (Last 30 Days)</h3>
+                    <canvas id="equity-chart"></canvas>
+                </div>
+                
+                <div class="card chart-card">
+                    <h3>🎯 Win/Loss Distribution</h3>
+                    <canvas id="winloss-chart"></canvas>
+                </div>
+            </div>
+            
+            <div class="charts-grid">
+                <div class="card chart-card">
+                    <h3>🕐 Performance by Session</h3>
+                    <canvas id="session-chart"></canvas>
+                </div>
+                
+                <div class="card chart-card">
+                    <h3>⚠️ Most Common Mistakes</h3>
+                    <canvas id="mistakes-chart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Detailed Stats Tables -->
+            <div class="card">
+                <h3>📊 Performance by Setup</h3>
+                <div id="setup-stats-table"></div>
+            </div>
+            
+            <div class="card">
+                <h3>🕐 Performance by Session</h3>
+                <div id="session-stats-table"></div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+    <script>
+        async function addSampleData() {
+            if (!confirm('This will add 10 sample closed trades. Continue?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/add-sample-data', {
+                    method: 'POST'
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('✅ Sample data added! Refreshing dashboard...');
+                    location.reload();
+                }
+            } catch (error) {
+                alert('❌ Error adding sample data');
+                console.error(error);
+            }
+        }
+    </script>
+</body>
+</html>
