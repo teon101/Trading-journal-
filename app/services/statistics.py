@@ -14,8 +14,9 @@ class StatisticsService:
         cursor.execute('''
             SELECT * FROM trades 
             WHERE status = 'closed'
+            ORDER BY exit_time
         ''')
-        trades = cursor.fetchall()
+        trades = [dict(row) for row in cursor.fetchall()]  # Convert to dict
         conn.close()
         
         if not trades:
@@ -36,8 +37,8 @@ class StatisticsService:
         
         # Calculate statistics
         total_trades = len(trades)
-        wins = [t for t in trades if t['profit_loss'] > 0]
-        losses = [t for t in trades if t['profit_loss'] <= 0]
+        wins = [t for t in trades if t.get('profit_loss') and t['profit_loss'] > 0]
+        losses = [t for t in trades if t.get('profit_loss') and t['profit_loss'] <= 0]
         
         total_wins = len(wins)
         total_losses = len(losses)
@@ -51,10 +52,10 @@ class StatisticsService:
         avg_loss = total_loss / total_losses if total_losses > 0 else 0
         
         # Expectancy = (Win% × Avg Win) - (Loss% × Avg Loss)
-        expectancy = (win_rate/100 * avg_win) - ((100-win_rate)/100 * avg_loss)
+        expectancy = (win_rate/100 * avg_win) - ((100-win_rate)/100 * avg_loss) if total_trades > 0 else 0
         
         # Profit Factor = Gross Profit / Gross Loss
-        profit_factor = total_profit / total_loss if total_loss > 0 else 0
+        profit_factor = total_profit / total_loss if total_loss > 0 else (total_profit if total_profit > 0 else 0)
         
         # Max Drawdown
         max_drawdown = self._calculate_max_drawdown(trades)
@@ -82,24 +83,31 @@ class StatisticsService:
         if not trades:
             return 0
         
-        # Sort by exit time
-        sorted_trades = sorted(trades, key=lambda x: x['exit_time'] or '')
+        # Filter trades with exit_time and sort
+        sorted_trades = sorted(
+            [t for t in trades if t.get('exit_time')], 
+            key=lambda x: x['exit_time'] or ''
+        )
+        
+        if not sorted_trades:
+            return 0
         
         balance = 0
         peak = 0
         max_drawdown = 0
         
         for trade in sorted_trades:
-            balance += trade['profit_loss']
-            if balance > peak:
-                peak = balance
-            drawdown = peak - balance
-            if drawdown > max_drawdown:
-                max_drawdown = drawdown
+            if trade.get('profit_loss'):
+                balance += trade['profit_loss']
+                if balance > peak:
+                    peak = balance
+                drawdown = peak - balance
+                if drawdown > max_drawdown:
+                    max_drawdown = drawdown
         
         return max_drawdown
     
-    def get_stats_by_timeframe(self, days=7):
+    def get_stats_by_timeframe(self, days=30):
         """Get statistics for a specific timeframe"""
         conn = self.db.get_connection()
         cursor = conn.cursor()
@@ -112,7 +120,7 @@ class StatisticsService:
             ORDER BY exit_time
         ''', (cutoff_date,))
         
-        trades = cursor.fetchall()
+        trades = [dict(row) for row in cursor.fetchall()]  # Convert to dict
         conn.close()
         
         if not trades:
@@ -121,6 +129,8 @@ class StatisticsService:
         # Group by day
         daily_stats = {}
         for trade in trades:
+            if not trade.get('exit_time'):
+                continue
             date = trade['exit_time'][:10]  # YYYY-MM-DD
             if date not in daily_stats:
                 daily_stats[date] = {
@@ -132,11 +142,12 @@ class StatisticsService:
                 }
             
             daily_stats[date]['trades'] += 1
-            daily_stats[date]['profit_loss'] += trade['profit_loss']
-            if trade['profit_loss'] > 0:
-                daily_stats[date]['wins'] += 1
-            else:
-                daily_stats[date]['losses'] += 1
+            if trade.get('profit_loss'):
+                daily_stats[date]['profit_loss'] += trade['profit_loss']
+                if trade['profit_loss'] > 0:
+                    daily_stats[date]['wins'] += 1
+                else:
+                    daily_stats[date]['losses'] += 1
         
         return list(daily_stats.values())
     
@@ -149,19 +160,19 @@ class StatisticsService:
             SELECT session, 
                    COUNT(*) as total,
                    SUM(CASE WHEN profit_loss > 0 THEN 1 ELSE 0 END) as wins,
-                   SUM(profit_loss) as total_pnl
+                   SUM(CASE WHEN profit_loss IS NOT NULL THEN profit_loss ELSE 0 END) as total_pnl
             FROM trades 
             WHERE status = 'closed'
             GROUP BY session
         ''')
         
-        results = cursor.fetchall()
+        results = [dict(row) for row in cursor.fetchall()]
         conn.close()
         
         stats = []
         for row in results:
             total = row['total']
-            wins = row['wins']
+            wins = row['wins'] or 0
             win_rate = (wins / total * 100) if total > 0 else 0
             
             stats.append({
@@ -170,7 +181,7 @@ class StatisticsService:
                 'wins': wins,
                 'losses': total - wins,
                 'win_rate': round(win_rate, 2),
-                'total_pnl': round(row['total_pnl'], 2)
+                'total_pnl': round(row['total_pnl'] or 0, 2)
             })
         
         return stats
@@ -184,19 +195,19 @@ class StatisticsService:
             SELECT setup_type, 
                    COUNT(*) as total,
                    SUM(CASE WHEN profit_loss > 0 THEN 1 ELSE 0 END) as wins,
-                   SUM(profit_loss) as total_pnl
+                   SUM(CASE WHEN profit_loss IS NOT NULL THEN profit_loss ELSE 0 END) as total_pnl
             FROM trades 
             WHERE status = 'closed'
             GROUP BY setup_type
         ''')
         
-        results = cursor.fetchall()
+        results = [dict(row) for row in cursor.fetchall()]
         conn.close()
         
         stats = []
         for row in results:
             total = row['total']
-            wins = row['wins']
+            wins = row['wins'] or 0
             win_rate = (wins / total * 100) if total > 0 else 0
             
             stats.append({
@@ -205,7 +216,7 @@ class StatisticsService:
                 'wins': wins,
                 'losses': total - wins,
                 'win_rate': round(win_rate, 2),
-                'total_pnl': round(row['total_pnl'], 2)
+                'total_pnl': round(row['total_pnl'] or 0, 2)
             })
         
         return stats
@@ -224,7 +235,7 @@ class StatisticsService:
             ORDER BY count DESC
         ''')
         
-        results = cursor.fetchall()
+        results = [dict(row) for row in cursor.fetchall()]
         conn.close()
         
-        return [dict(row) for row in results]
+        return results

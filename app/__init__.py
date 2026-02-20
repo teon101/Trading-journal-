@@ -20,15 +20,17 @@ def create_app():
     from app.models.database import Database
     Database(app.config['DATABASE'])
     
-    # Register blueprints
+    # Register blueprints - IMPORTANT: Make sure this line is here!
     from app.routes.main import bp as main_bp
     from app.routes.trades import bp as trades_bp
     from app.routes.screenshots import bp as screenshots_bp
     from app.routes.tags import bp as tags_bp
+    from app.routes.statistics import bp as statistics_bp  # THIS LINE MUST BE HERE
     
     app.register_blueprint(main_bp)
     app.register_blueprint(trades_bp)
     app.register_blueprint(screenshots_bp)
     app.register_blueprint(tags_bp)
+    app.register_blueprint(statistics_bp)  # THIS LINE MUST BE HERE
     
     return app
