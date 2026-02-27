@@ -1,16 +1,16 @@
+cat > render.yaml << 'EOF'
 services:
   - type: web
     name: tradejournal
     env: python
     plan: free
     buildCommand: "./build.sh"
-    startCommand: "gunicorn run:app"
+    startCommand: "gunicorn run:app --bind 0.0.0.0:$PORT"
     envVars:
       - key: PYTHON_VERSION
-        value: 3.12.1
+        value: 3.11.0
       - key: SECRET_KEY
         generateValue: true
       - key: FLASK_ENV
         value: production
-      - key: DATABASE_PATH
-        value: /opt/render/project/src/database/trading_journal.db
+EOF
