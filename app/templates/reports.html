@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monthly Reports - Trading Journal</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="/" class="logo">
+                <div class="logo-icon">TJ</div>
+                <span>TradeJournal</span>
+            </a>
+            
+            <h1>Monthly Reports</h1>
+            <p>Track Your Progress Over Time</p>
+            
+            <!-- Theme Toggle -->
+            <div class="theme-toggle" onclick="toggleTheme()">
+                <svg class="theme-toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                </svg>
+                <span class="theme-toggle-text" id="theme-text">Dark</span>
+            </div>
+        </header>
+        
+        <nav class="nav-tabs">
+            <a href="/" class="nav-tab">Journal</a>
+            <a href="/dashboard" class="nav-tab">Dashboard</a>
+            <a href="/reports" class="nav-tab active">Reports</a>
+        </nav>
+        
+        <main>
+            <!-- Month Selector -->
+            <div class="card">
+                <h2>Select Month</h2>
+                <div class="month-selector">
+                    <select id="month-select" onchange="loadMonthlyReport()">
+                        <!-- Populated by JS -->
+                    </select>
+                    <select id="year-select" onchange="loadMonthlyReport()">
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Monthly Report -->
+            <div id="monthly-report">
+                <p class="loading">Select a month to view report</p>
+            </div>
+        </main>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/reports.js') }}"></script>
+    <script>
+        // Theme Toggle Function
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            document.getElementById('theme-text').textContent = 
+                newTheme === 'light' ? 'Light' : 'Dark';
+        }
+        
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.getElementById('theme-text').textContent = 
+            savedTheme === 'light' ? 'Light' : 'Dark';
+    </script>
+</body>
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeJournal - Professional Trading Analytics</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/welcome" class="nav-logo">
+                <div class="logo-icon">TJ</div>
+                <span>TradeJournal</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#pricing">Pricing</a>
+                <a href="/auth/login" class="btn-nav-login">Sign In</a>
+                <a href="/auth/register" class="btn-nav-cta">Get Started</a>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    Master Your Trading<br>
+                    <span class="gradient-text">With Data-Driven Insights</span>
+                </h1>
+                <p class="hero-description">
+                    Professional trading journal that helps you track, analyze, and improve your trading performance. 
+                    Make better decisions with powerful analytics.
+                </p>
+                <div class="hero-cta">
+                    <a href="/auth/register" class="btn-primary-large">Start Free Trial</a>
+                    <a href="#demo" class="btn-secondary-large">Watch Demo</a>
+                </div>
+                <p class="hero-note">No credit card required • Free 14-day trial</p>
+            </div>
+            
+            <div class="hero-image">
+                <div class="dashboard-preview">
+                    <div class="preview-header">
+                        <div class="preview-dots">
+                            <span></span><span></span><span></span>
+                        </div>
+                    </div>
+                    <div class="preview-content">
+                        <div class="preview-stats">
+                            <div class="preview-stat">
+                                <div class="stat-value">+$2,847</div>
+                                <div class="stat-label">Total P/L</div>
+                            </div>
+                            <div class="preview-stat">
+                                <div class="stat-value">68%</div>
+                                <div class="stat-label">Win Rate</div>
+                            </div>
+                            <div class="preview-stat">
+                                <div class="stat-value">1:2.4</div>
+                                <div class="stat-label">R:R Ratio</div>
+                            </div>
+                        </div>
+                        <div class="preview-chart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-header">
+                <h2>Everything You Need to Succeed</h2>
+                <p>Powerful features designed for serious traders</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Advanced Analytics</h3>
+                    <p>Track win rate, R:R ratio, expectancy, drawdown, and more with real-time calculations.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📸</div>
+                    <h3>Screenshot Capture</h3>
+                    <p>Automatically save your chart setups before and after each trade for review.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🏷️</div>
+                    <h3>Mistake Tracking</h3>
+                    <p>Tag and analyze your trading mistakes to identify patterns and improve discipline.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📈</div>
+                    <h3>Performance Reports</h3>
+                    <p>Monthly summaries with detailed breakdowns of your best and worst trades.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Setup Analysis</h3>
+                    <p>Discover which trading setups work best for you with comprehensive statistics.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">💾</div>
+                    <h3>Export Data</h3>
+                    <p>Download your trading history as CSV for further analysis or record keeping.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Pricing Section -->
+    <section id="pricing" class="pricing">
+        <div class="container">
+            <div class="section-header">
+                <h2>Simple, Transparent Pricing</h2>
+                <p>Choose the plan that fits your trading journey</p>
+            </div>
+            
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Free</h3>
+                        <div class="pricing-price">
+                            <span class="price">$0</span>
+                            <span class="period">/month</span>
+                        </div>
+                    </div>
+                    <ul class="pricing-features">
+                        <li>✓ Up to 50 trades</li>
+                        <li>✓ Basic analytics</li>
+                        <li>✓ Screenshot storage</li>
+                        <li>✓ Export to CSV</li>
+                    </ul>
+                    <a href="/auth/register" class="btn-pricing">Get Started</a>
+                </div>
+                
+                <div class="pricing-card pricing-card-featured">
+                    <div class="pricing-badge">Most Popular</div>
+                    <div class="pricing-header">
+                        <h3>Pro</h3>
+                        <div class="pricing-price">
+                            <span class="price">$19</span>
+                            <span class="period">/month</span>
+                        </div>
+                    </div>
+                    <ul class="pricing-features">
+                        <li>✓ Unlimited trades</li>
+                        <li>✓ Advanced analytics</li>
+                        <li>✓ Unlimited screenshots</li>
+                        <li>✓ Monthly reports</li>
+                        <li>✓ Priority support</li>
+                        <li>✓ Dark mode</li>
+                    </ul>
+                    <a href="/auth/register" class="btn-pricing btn-pricing-featured">Start Free Trial</a>
+                </div>
+                
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Enterprise</h3>
+                        <div class="pricing-price">
+                            <span class="price">Custom</span>
+                        </div>
+                    </div>
+                    <ul class="pricing-features">
+                        <li>✓ Everything in Pro</li>
+                        <li>✓ Team collaboration</li>
+                        <li>✓ Custom integrations</li>
+                        <li>✓ Dedicated support</li>
+                        <li>✓ API access</li>
+                    </ul>
+                    <a href="#contact" class="btn-pricing">Contact Sales</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Level Up Your Trading?</h2>
+                <p>Join thousands of traders improving their performance with TradeJournal</p>
+                <a href="/auth/register" class="btn-primary-large">Start Your Free Trial</a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <div class="logo-icon">TJ</div>
+                        <span>TradeJournal</span>
+                    </div>
+                    <p>Professional trading analytics platform</p>
+                </div>
+                
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Product</h4>
+                        <a href="#features">Features</a>
+                        <a href="#pricing">Pricing</a>
+                        <a href="#demo">Demo</a>
+                    </div>
+                    
+                    <div class="footer-column">
+                        <h4>Company</h4>
+                        <a href="#about">About</a>
+                        <a href="#contact">Contact</a>
+                        <a href="#careers">Careers</a>
+                    </div>
+                    
+                    <div class="footer-column">
+                        <h4>Legal</h4>
+                        <a href="#privacy">Privacy</a>
+                        <a href="#terms">Terms</a>
+                        <a href="#security">Security</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 TradeJournal. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

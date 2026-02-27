@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<header>
+    <a href="/" class="logo">
+        <div class="logo-icon">TJ</div>
+        <span>TradeJournal</span>
+    </a>
+    
+    <h1>Trading Journal</h1>
+    <p>Professional Trade Analytics</p>
+    
+    <!-- ADD THIS STATUS BADGE -->
+    <div class="status-indicator">
+        <span id="online-status" class="status-badge online">Online</span>
+    </div>
+    
+    <div class="header-actions">
+        <button onclick="exportToCSV()" class="btn-export">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+            </svg>
+            Export CSV
+        </button>
+    </div>
+    
+    <div class="theme-toggle" onclick="toggleTheme()">
+        <svg class="theme-toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+        </svg>
+        <span class="theme-toggle-text" id="theme-text">Dark</span>
+    </div>
+</header>
+
+<!-- ADD THIS SCRIPT TAG -->
+<script src="{{ url_for('static', filename='js/offline-detector.js') }}"></script>
+<body>
+    <div class="container">
+        <header>
+            <a href="/" class="logo">
+                <div class="logo-icon">TJ</div>
+                <span>TradeJournal</span>
+            </a>
+           
+            <h1>Dashboard</h1>
+            <p>Trading Performance Analytics</p>
+            
+            <!-- Theme Toggle -->
+            <div class="theme-toggle" onclick="toggleTheme()">
+                <svg class="theme-toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                </svg>
+                <span class="theme-toggle-text" id="theme-text">Dark</span>
+            </div>
+        </header>
+        
+        <nav class="nav-tabs">
+    <a href="/" class="nav-tab active">Journal</a>
+    <a href="/dashboard" class="nav-tab">Dashboard</a>
+    <a href="/reports" class="nav-tab">Reports</a>
+</nav>
+        
+        <main>
+            <!-- TOP ROW - Main Metrics (Bigger) -->
+            <div class="stats-grid-main">
+                <div class="stat-card stat-card-large">
+                    <div class="stat-icon">$</div>
+                    <div class="stat-value" id="total-pnl">$0.00</div>
+                    <div class="stat-label">Total P/L</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">%</div>
+                    <div class="stat-value" id="win-rate">0%</div>
+                    <div class="stat-label">Win Rate</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">⚖</div>
+                    <div class="stat-value" id="profit-factor">0.00</div>
+                    <div class="stat-label">Profit Factor</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">↓</div>
+                    <div class="stat-value" id="max-drawdown">$0.00</div>
+                    <div class="stat-label">Max Drawdown</div>
+                </div>
+            </div>
+            
+            <!-- SECOND ROW - Secondary Metrics -->
+            <div class="stats-grid-secondary">
+                <div class="stat-card stat-card-small">
+                    <div class="stat-icon">#</div>
+                    <div class="stat-value" id="total-trades">0</div>
+                    <div class="stat-label">Total Trades</div>
+                </div>
+                
+                <div class="stat-card stat-card-small">
+                    <div class="stat-icon">R</div>
+                    <div class="stat-value" id="avg-r-multiple">0.00</div>
+                    <div class="stat-label">Avg R Multiple</div>
+                </div>
+                
+                <div class="stat-card stat-card-small">
+                    <div class="stat-icon">✓</div>
+                    <div class="stat-value" id="risk-discipline">0%</div>
+                    <div class="stat-label">Risk Discipline</div>
+                </div>
+                
+                <div class="stat-card stat-card-small">
+                    <div class="stat-icon">~</div>
+                    <div class="stat-value" id="current-streak">-</div>
+                    <div class="stat-label">Current Streak</div>
+                </div>
+            </div>
+            
+            <!-- THIRD SECTION - Charts Row -->
+            <div class="charts-row-main">
+                <div class="card chart-card chart-card-large">
+                    <h3>Equity Curve (Last 30 Days)</h3>
+                    <canvas id="equity-chart"></canvas>
+                </div>
+                
+                <div class="card chart-card chart-card-medium">
+                    <h3>Win/Loss Distribution</h3>
+                    <canvas id="winloss-chart"></canvas>
+                </div>
+            </div>
+            
+            <!-- FOURTH SECTION - Performance Tables -->
+            <div class="performance-tables">
+                <div class="card">
+                    <h3>Performance by Session</h3>
+                    <div id="session-stats-table"></div>
+                </div>
+                
+                <div class="card">
+                    <h3>Performance by Setup</h3>
+                    <div id="setup-stats-table"></div>
+                </div>
+            </div>
+            
+            <!-- Mistakes Chart -->
+            <div class="card chart-card chart-card-mistakes">
+                <h3>Most Common Mistakes</h3>
+                <canvas id="mistakes-chart"></canvas>
+            </div>
+        </main>
+    </div>
+
+    <!-- Hidden Dev Menu (Ctrl+Shift+D to toggle) -->
+    <div id="dev-menu" style="display: none; position: fixed; bottom: 20px; right: 20px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; z-index: 9999;">
+        <h4 style="margin-bottom: 12px; color: var(--text-primary);">Dev Menu</h4>
+        <button onclick="addSampleData()" class="btn-primary" style="width: auto; padding: 8px 16px; margin-top: 0;">
+            Add Sample Data
+        </button>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+    <script>
+        // Theme Toggle Function
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            document.getElementById('theme-text').textContent = 
+                newTheme === 'light' ? 'Light' : 'Dark';
+            
+            location.reload();
+        }
+        
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.getElementById('theme-text').textContent = 
+            savedTheme === 'light' ? 'Light' : 'Dark';
+        
+        async function addSampleData() {
+            if (!confirm('This will add 10 sample closed trades. Continue?')) return;
+            
+            try {
+                const response = await fetch('/api/add-sample-data', { method: 'POST' });
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('✅ Sample data added! Refreshing dashboard...');
+                    location.reload();
+                }
+            } catch (error) {
+                alert('❌ Error adding sample data');
+                console.error(error);
+            }
+        }
+
+        // Toggle dev menu with Ctrl+Shift+D
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+                const menu = document.getElementById('dev-menu');
+                menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+            }
+        });
+    </script>
+</body>
+</html>

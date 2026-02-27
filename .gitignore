@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# Database
+database/*.db
+database/*.db-journal
+*.sqlite
+*.sqlite3
+
+# Uploads
+app/static/screenshots/*
+!app/static/screenshots/.gitkeep
+
+# Backups
+backups/
+*.gz
+
+# Environment
+.env
+.env.local
+
+# Playwright browsers
+.playwright/
+playwright/.local-browsers/
+
+# OS
+.DS_Store
+Thumbs.db
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
