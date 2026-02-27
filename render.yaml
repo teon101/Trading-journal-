@@ -2,10 +2,15 @@ services:
   - type: web
     name: tradejournal
     env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn run:app
+    plan: free
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn run:app"
     envVars:
-      - key: FLASK_ENV
-        value: production
+      - key: PYTHON_VERSION
+        value: 3.12.1
       - key: SECRET_KEY
         generateValue: true
+      - key: FLASK_ENV
+        value: production
+      - key: DATABASE_PATH
+        value: /opt/render/project/src/database/trading_journal.db
