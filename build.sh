@@ -1,4 +1,3 @@
-cat > build.sh << 'EOF'
 #!/usr/bin/env bash
 set -o errexit
 
@@ -11,6 +10,3 @@ mkdir -p app/static/screenshots
 python manage.py migrate
 
 echo "Build complete"
-EOF
-
-chmod +x build.sh
