@@ -1,8 +1,5 @@
-# Create index.py that imports your app
 cat > index.py << 'EOF'
-from run import app
+from app import create_app
 
-# Vercel needs this
-if __name__ == "__main__":
-    app.run()
+app = create_app()
 EOF
