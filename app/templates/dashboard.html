@@ -1,38 +1,339 @@
 <!DOCTYPE html>
 <html lang="en">
-<header>
-    <a href="/" class="logo">
-        <div class="logo-icon">TJ</div>
-        <span>TradeJournal</span>
-    </a>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Trading Journal</title>
     
-    <h1>Trading Journal</h1>
-    <p>Professional Trade Analytics</p>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
-    <!-- ADD THIS STATUS BADGE -->
-    <div class="status-indicator">
-        <span id="online-status" class="status-badge online">Online</span>
-    </div>
-    
-    <div class="header-actions">
-        <button onclick="exportToCSV()" class="btn-export">
-            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-            </svg>
-            Export CSV
-        </button>
-    </div>
-    
-    <div class="theme-toggle" onclick="toggleTheme()">
-        <svg class="theme-toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
-        </svg>
-        <span class="theme-toggle-text" id="theme-text">Dark</span>
-    </div>
-</header>
+    <style>
+        /* INLINE CSS */
+        :root {
+            --bg-primary: #0B0F19;
+            --bg-secondary: #111827;
+            --bg-tertiary: #1F2937;
+            --border-color: rgba(255, 255, 255, 0.05);
+            --text-primary: #F9FAFB;
+            --text-secondary: #9CA3AF;
+            --text-tertiary: #6B7280;
+            --profit-green: #16C784;
+            --loss-red: #EA3943;
+            --accent-blue: #3B82F6;
+            --warning-yellow: #F59E0B;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+        }
 
-<!-- ADD THIS SCRIPT TAG -->
-<script src="{{ url_for('static', filename='js/offline-detector.js') }}"></script>
+        [data-theme="light"] {
+            --bg-primary: #F9FAFB;
+            --bg-secondary: #FFFFFF;
+            --bg-tertiary: #F3F4F6;
+            --border-color: #E5E7EB;
+            --text-primary: #111827;
+            --text-secondary: #4B5563;
+            --text-tertiary: #9CA3AF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-secondary);
+        }
+
+        .logo {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 700;
+            font-size: 1.25em;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, #2563EB 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2em;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 0;
+            right: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 30px;
+            background: var(--bg-secondary);
+            padding: 6px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .nav-tab:hover {
+            color: var(--text-primary);
+            background: var(--bg-tertiary);
+        }
+
+        .nav-tab.active {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .stats-grid-main {
+            display: grid;
+            grid-template-columns: 1.3fr 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stats-grid-secondary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-4px);
+        }
+
+        .stat-card-large .stat-value {
+            font-size: 2.5em;
+        }
+
+        .stat-card-small .stat-value {
+            font-size: 1.5em;
+        }
+
+        .stat-icon {
+            font-size: 1.5em;
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+        }
+
+        .stat-value {
+            font-size: 1.75em;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 0.875em;
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .charts-row-main {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .card h3 {
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            font-size: 1.25em;
+            font-weight: 600;
+        }
+
+        .chart-card {
+            min-height: 350px;
+            position: relative;
+        }
+
+        .chart-card canvas {
+            max-height: 300px !important;
+            height: 300px !important;
+        }
+
+        .chart-card-large {
+            min-height: 400px;
+        }
+
+        .chart-card-medium {
+            min-height: 400px;
+        }
+
+        .chart-card-large canvas {
+            max-height: 350px !important;
+            height: 350px !important;
+        }
+
+        .chart-card-medium canvas {
+            max-height: 350px !important;
+            height: 350px !important;
+        }
+
+        .chart-card-mistakes {
+            min-height: 280px !important;
+            max-height: 280px;
+        }
+
+        .chart-card-mistakes canvas {
+            max-height: 220px !important;
+            height: 220px !important;
+        }
+
+        .performance-tables {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9em;
+        }
+
+        th {
+            background: var(--bg-tertiary);
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.8em;
+            text-transform: uppercase;
+        }
+
+        td {
+            color: var(--text-secondary);
+        }
+
+        tr:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .positive {
+            color: var(--profit-green);
+            font-weight: 600;
+        }
+
+        .negative {
+            color: var(--loss-red);
+            font-weight: 600;
+        }
+
+        .loading {
+            text-align: center;
+            color: var(--text-tertiary);
+            padding: 40px;
+        }
+
+        @media (max-width: 1200px) {
+            .stats-grid-main {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .charts-row-main {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid-main,
+            .stats-grid-secondary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .performance-tables {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
 <body>
     <div class="container">
         <header>
@@ -40,27 +341,23 @@
                 <div class="logo-icon">TJ</div>
                 <span>TradeJournal</span>
             </a>
-           
+            
             <h1>Dashboard</h1>
             <p>Trading Performance Analytics</p>
             
-            <!-- Theme Toggle -->
             <div class="theme-toggle" onclick="toggleTheme()">
-                <svg class="theme-toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
-                </svg>
                 <span class="theme-toggle-text" id="theme-text">Dark</span>
             </div>
         </header>
         
         <nav class="nav-tabs">
-    <a href="/" class="nav-tab active">Journal</a>
-    <a href="/dashboard" class="nav-tab">Dashboard</a>
-    <a href="/reports" class="nav-tab">Reports</a>
-</nav>
+            <a href="/" class="nav-tab">Journal</a>
+            <a href="/dashboard" class="nav-tab active">Dashboard</a>
+            <a href="/reports" class="nav-tab">Reports</a>
+        </nav>
         
         <main>
-            <!-- TOP ROW - Main Metrics (Bigger) -->
+            <!-- Top Row - Main Metrics -->
             <div class="stats-grid-main">
                 <div class="stat-card stat-card-large">
                     <div class="stat-icon">$</div>
@@ -87,7 +384,7 @@
                 </div>
             </div>
             
-            <!-- SECOND ROW - Secondary Metrics -->
+            <!-- Second Row - Secondary Metrics -->
             <div class="stats-grid-secondary">
                 <div class="stat-card stat-card-small">
                     <div class="stat-icon">#</div>
@@ -114,7 +411,7 @@
                 </div>
             </div>
             
-            <!-- THIRD SECTION - Charts Row -->
+            <!-- Charts Row -->
             <div class="charts-row-main">
                 <div class="card chart-card chart-card-large">
                     <h3>Equity Curve (Last 30 Days)</h3>
@@ -127,7 +424,7 @@
                 </div>
             </div>
             
-            <!-- FOURTH SECTION - Performance Tables -->
+            <!-- Performance Tables -->
             <div class="performance-tables">
                 <div class="card">
                     <h3>Performance by Session</h3>
@@ -147,62 +444,22 @@
             </div>
         </main>
     </div>
-
-    <!-- Hidden Dev Menu (Ctrl+Shift+D to toggle) -->
-    <div id="dev-menu" style="display: none; position: fixed; bottom: 20px; right: 20px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; z-index: 9999;">
-        <h4 style="margin-bottom: 12px; color: var(--text-primary);">Dev Menu</h4>
-        <button onclick="addSampleData()" class="btn-primary" style="width: auto; padding: 8px 16px; margin-top: 0;">
-            Add Sample Data
-        </button>
-    </div>
     
     <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
     <script>
-        // Theme Toggle Function
         function toggleTheme() {
             const html = document.documentElement;
             const currentTheme = html.getAttribute('data-theme');
             const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            
             html.setAttribute('data-theme', newTheme);
             localStorage.setItem('theme', newTheme);
-            
-            document.getElementById('theme-text').textContent = 
-                newTheme === 'light' ? 'Light' : 'Dark';
-            
+            document.getElementById('theme-text').textContent = newTheme === 'light' ? 'Light' : 'Dark';
             location.reload();
         }
         
-        // Load saved theme
         const savedTheme = localStorage.getItem('theme') || 'dark';
         document.documentElement.setAttribute('data-theme', savedTheme);
-        document.getElementById('theme-text').textContent = 
-            savedTheme === 'light' ? 'Light' : 'Dark';
-        
-        async function addSampleData() {
-            if (!confirm('This will add 10 sample closed trades. Continue?')) return;
-            
-            try {
-                const response = await fetch('/api/add-sample-data', { method: 'POST' });
-                const result = await response.json();
-                
-                if (result.success) {
-                    alert('✅ Sample data added! Refreshing dashboard...');
-                    location.reload();
-                }
-            } catch (error) {
-                alert('❌ Error adding sample data');
-                console.error(error);
-            }
-        }
-
-        // Toggle dev menu with Ctrl+Shift+D
-        document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.shiftKey && e.key === 'D') {
-                const menu = document.getElementById('dev-menu');
-                menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
-            }
-        });
+        document.getElementById('theme-text').textContent = savedTheme === 'light' ? 'Light' : 'Dark';
     </script>
 </body>
 </html>
